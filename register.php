@@ -236,7 +236,7 @@ class ProcessHTTP
 	        $salt = $this->salt;
 	        $active = 1;
 	        
-			$insert_query = "INSERT INTO doctors (first_name, last_name, email, country, province, password, hash_salt, postal_code, profession, specialty, language, active, registration_date, last_visit, matricule) VALUES (:first_name,:last_name,:email,:country,:province,:password,:hash_salt,:postal_code,:profession,:specialty,:language,:active, NOW(), NOW(),:matricule)"; 
+			$insert_query = "INSERT INTO doctors (first_name, last_name, email, country, province, password, hash_salt, postal_code, profession, specialty, language, active, registration_date, last_visit, matricule, merck) VALUES (:first_name,:last_name,:email,:country,:province,:password,:hash_salt,:postal_code,:profession,:specialty,:language,:active, NOW(), NOW(),:matricule, true)"; 
 			
 			$stmt = $this->db_connection->prepare($insert_query);
 			$stmt->execute(array(':first_name'=>$this->user_data['first_name'],
@@ -270,7 +270,13 @@ class ProcessHTTP
 
         while($result_row = $query->fetch() ){
 	        	if($result_row[0] == 0) return true;
-	        	else return false;
+	        	else{
+                    $updateMerck = "UPDATE doctors SET merck = true WHERE email = :email";
+                    $query = $this->db_connection->prepare($updateMerck);
+                    $query->bindValue(':email', $email);
+                    $query->execute();
+                    return false;
+                }
         }
 
 		return false;   
