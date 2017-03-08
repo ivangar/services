@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>dxLink - Merckconnect</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <link href="css/styles.css" rel="stylesheet" type="text/css" />
+  <script src="js/main.js" type="text/javascript"></script> 
+  <script type="text/javascript">
+
+  </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron" style="padding-bottom:10px;">
+        <h2>dxLink - Merckconnect web service</h2> 
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>User registration process</h3>
+        <p>Following is the information that needs to be sent to dxLink.ca in order to process and register a Merckconnect user to dxLink database</p>
+        <p>For testing the web service, the request should be sent to the development sandbox environment: <span class="url">https://dxlink.ca/sandbox/registration.php</span>. After testing/debugging process is complete, the HTTP header url should be replaced by: <span class="url">https://dxlink.ca/services/registration.php</span>.</p>
+        <p><span style="font-weight:bold;">HTTP Request specs:</span></p>
+        <div class="row">
+            <div class="col-md-10 indent">
+                <p>Authentication: None <br>Request header content type: 'Content-Type: application/json'<br>Request method: POST<br>HTTP message body: </p>
+                <pre id='json-request' style="width:300px;"></pre>
+            </div>
+        </div>
+        <p>The The first four values are compulsory. If they are null or empty the registration can't be completed and a 400 Bad request response status code will be returned.</p>
+        <p>Also, if the jSON received is malformed or missing any of the key-value pairs, a 400 Bad request with a message is sent back. The dxLink script is expecting the sta_agreement value to be true, meaning that the user agrees to the terms and conditions before leaving the Merckconnect portal. If the "sta_agreement" field is a false boolean, then the following response will be sent:</p>
+        <div class="row">
+            <div class="col-md-10 indent">
+                <p><span style="font-weight:bold;">Status Code: 202 Accepted</span></p>
+                <pre id='json-toa' style="width:500px;"></pre>
+            </div>
+        </div>
+        <p>Once the jSON object has been parsed, this data will be queried against the database. If a user with the unique email is found in the database records, a 200 Ok Status Code is returned with the response message:</p>
+        <div class="row">
+            <div class="col-md-10 indent">
+                <p><span style="font-weight:bold;">Status Code: 200 Ok</span></p>
+                <pre id='user-exists' style="width:500px;"></pre>
+            </div>
+        </div>
+        <p>If the user is not yet registered, a new record is inserted in the database and an HTTP Response header is sent back:</p>
+        <div class="row">
+            <div class="col-md-10 indent">
+                <p><span style="font-weight:bold;">Status Code: 201 Created</span></p>
+                <pre id='created' style="width:500px;"></pre>
+            </div>
+        </div>
+        <h3>eCME Program access</h3>
+        <p>After the successful response header is sent (status code is 200 or 201), Merckconnect platfrom is now able to redirect the user to the clicked program. The redirection to the link must be sent along with the following fields: </p>
+            <div class="col-md-3 indent">
+                 <table class="table table-hover table-bordered" >
+                    <thead>
+                      <tr> <th >Name</th> <th >Value</th>
+                      </tr>
+                    </thead>
+                    <tbody >
+                       <tr class="active"> <td>email</td>  <td>mail@mail.com</td>
+                        </tr>
+                        <tr class="active"> <td>merckConnect</td> <td>true</td>
+                       </tr>
+                    </tbody>
+                  </table> 
+            </div>
+            <p style="padding-top:45px;">The value of the parameter email is a String and merckConnect parameter has a boolean value.</p>
+            <div style="clear:both;"></div>
+        <p>The first value is the email of the user which was submitted in the Registration process. The second value is a boolean flag. It is important to send the merckConnect key/value pair, since dxLink will be checking this flag in order to acknowledge that the request is coming from MerckConnect portal. For development purposes a dummy program was setup in the sandbox environment. The url that should be used for testing the access to the dummy program is: <span class="url">https://dxlink.ca/sandbox/program/ait/index.php</span>.</p>
+        <p>Below is an example using a request method GET with the url and the query string params.</p>
+        <p style="padding:10px 0;"><img width="688" height="23" src="img/url.png" title="url" alt="url_demo" /></p>
+        <p>The request can be issued using either GET or POST methods. The user email is queried against the database and if it exists, a Session will be created and the user will be logged. Otherwise this will bring to the <a href="https://dxlink.ca/AccessDeny/deny_access.html" target="_blank">access denied</a> page.</p>
+      </div>
+ 
+    </div>
+</div>
+
+</body>
+</html>
