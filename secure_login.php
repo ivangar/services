@@ -1,7 +1,13 @@
 <?php
 if(!isset($_SESSION)){ session_start(); }
 require_once($_SERVER['DOCUMENT_ROOT'] . '/fr/inc/config/config_dxlink_env.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . "/inc/config/constants.php");
+//require_once($_SERVER['DOCUMENT_ROOT'] . "/inc/config/constants.php");
+
+define('HOST', 'localhost');
+define('DATABASE', 'dxlink_local_db');
+define('USER', 'dxlink');
+define('PWD', 'sRPzlNHns3x2');
+define('ENCODING', 'utf8');
 
 function DB_Connect()
 {
@@ -193,10 +199,11 @@ elseif(isset($_GET['email']) && isset($_GET['merckConnect'])){
     }
 }
 
+/*
 else{
     $url = FIXED_SSL_URL.$_SERVER['HTTP_HOST'].'/AccessDeny/deny_access.html';
     header('Location: ' . $url);
 }
-
+*/
 
 ?>
