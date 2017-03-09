@@ -1,6 +1,6 @@
 <?php
 if(!isset($_SESSION)){ session_start(); }
-require_once($_SERVER['DOCUMENT_ROOT'] . '/fr/inc/config/config_dxlink_env.php');
+//require_once($_SERVER['DOCUMENT_ROOT'] . '/fr/inc/config/config_dxlink_env.php');
 //require_once($_SERVER['DOCUMENT_ROOT'] . "/inc/config/constants.php");
 
 define('HOST', 'localhost');
@@ -8,6 +8,7 @@ define('DATABASE', 'dxlink_local_db');
 define('USER', 'dxlink');
 define('PWD', 'sRPzlNHns3x2');
 define('ENCODING', 'utf8');
+define( 'FIXED_SSL_URL', 'https://' ); //since local testing uses fake SSL it should be http://
 
 function DB_Connect()
 {
@@ -85,18 +86,21 @@ class Login
             if($this->GetUserFromEmail()){
 
                 //make functions to set the sessions
+                $this->setSessions();
                 $this->user_exists = true;
             }
         }
     }
 
     public function validate($value)
-    {
-        if(!isset($value) || empty($value)){
-            return false;
-        }
+    {   
         
-        else return true;
+        if($value){
+            return true;
+        }
+
+        else{ return false;}
+
     }  
 
     //Checks field existance in the Database. If it exists it returns false, else it means it is not yet in the database and returns true
@@ -141,28 +145,18 @@ class Login
 
     }
 
+    public function setSessions()
+    {
+        $_SESSION['user_id'] = $this->getuserID(); //doctor id
+        $_SESSION[$this->GetLoginSessionVar()] = $_SESSION['user_id'];
+    }
+
     public function getuserID(){
         return $this->doctor_id;
     }
 
     public function Close_DB_connection(){
         $this->db_connection = null;
-    }
-
-    public function printLogout(){
-        $email = $this->email;
-        $this->logout = '';
-        $this->logout .= "<table cellpading='0' cellspacing='0'>
-                            <tr>
-                                <td style='padding:0 20px 20px 10px;margin0;'>
-                                    <label style='align:middle;' ><span class='textrevised'>You are currently logged in as $email </span></label>
-                                </td>
-                                <td style='padding:0 20px 20px 10px;margin0;'>
-                                    <button id='logout' type='button' name='Submit_logout' class=' form-submit-button-cool_grey_rounded'>Logout</button>
-                                </td>
-                            </tr>
-                          </table> ";
-        return $this->logout;
     }
 
 }
@@ -177,7 +171,7 @@ if(isset($_POST['email']) && isset($_POST['merckConnect'])){
             $url = FIXED_SSL_URL.$_SERVER['HTTP_HOST'].'/AccessDeny/deny_access.html';
             header('Location: ' . $url);
         }
-        $logout = $login->printLogout();
+
         $login->Close_DB_connection();
     }
 
@@ -194,16 +188,10 @@ elseif(isset($_GET['email']) && isset($_GET['merckConnect'])){
             $url = FIXED_SSL_URL.$_SERVER['HTTP_HOST'].'/AccessDeny/deny_access.html';
             header('Location: ' . $url);
         }
-        $logout = $login->printLogout();
+
         $login->Close_DB_connection();
     }
 }
 
-/*
-else{
-    $url = FIXED_SSL_URL.$_SERVER['HTTP_HOST'].'/AccessDeny/deny_access.html';
-    header('Location: ' . $url);
-}
-*/
 
 ?>
