@@ -102,7 +102,7 @@ class Login
     //Checks field existance in the Database. If it exists it returns false, else it means it is not yet in the database and returns true
     public function userExists()
     {
-        $sql = "SELECT COUNT(*) FROM (SELECT * FROM temp WHERE email = :email) AS subquery";
+        $sql = "SELECT COUNT(*) FROM (SELECT * FROM doctors WHERE email = :email) AS subquery";
 
         $query = $this->db_connection->prepare($sql);
         $query->bindValue(':email', $this->email);
@@ -125,7 +125,7 @@ class Login
 
     public function GetUserFromEmail()
     {
-        $sql = "SELECT * FROM temp WHERE email = :email";
+        $sql = "SELECT * FROM doctors WHERE email = :email";
 
         $query = $this->db_connection->prepare($sql);
         $query->bindValue(':email', $this->email);
