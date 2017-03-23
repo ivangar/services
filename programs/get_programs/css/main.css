@@ -1,0 +1,82 @@
+#feedback{
+	/* display: none; */
+}
+
+table.table-striped > tbody > tr:hover{
+    background-color: #EEDBFF;
+}
+
+
+table.table-striped th{
+    color: #428bca;
+    cursor: pointer;
+}
+
+table.table-bordered th, table.table-bordered td {
+   text-align: center;   
+}
+
+a.normal{
+	color: black;
+}
+
+.agenda{
+	padding-left:25px;
+	padding-bottom:15px;
+	color:#0C53A1;
+}
+
+.agenda ul{
+    padding-left:13px;
+    line-height: 1.5em;
+    margin:0;
+}
+
+.description_box ul{
+    padding-left:13px;
+    line-height: 1.5em;
+    margin:0;
+}
+
+.agenda ul li, .description_box ul li {
+  list-style: none;
+}
+
+.agenda ul li:before, .description_box ul li:before {
+  content: '\2022';
+  display: block;
+  position: relative;
+  max-width: 0;
+  max-height: 0;
+  left: -13px;
+  top: 0;
+  color: #A8C133;
+  font-size: 17px;
+}
+
+.custom_blue{
+	color:#0C53A1;
+}
+
+.custom_green{
+	color:#A8C133;
+}
+
+.green_panel{
+	border-width: 2px;
+	border-color: #A8C133;
+}
+
+.divider {
+  height: 2px;
+  width:100%;
+  display:block; /* for use on default inline elements like span */
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #A8C133;
+}
+
+.top-buffer { margin-top:20px; }
+.bottom-buffer { margin-bottom:20px; }
+.top-shift { margin-top:-15px; }
+.bottom-shift { margin-bottom:-15px; }
