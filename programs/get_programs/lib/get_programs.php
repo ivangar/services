@@ -1,15 +1,6 @@
 <?php 
-//require_once($_SERVER['DOCUMENT_ROOT'] . "/inc/php/connect_db.php");
+require_once($_SERVER['DOCUMENT_ROOT'] . "/inc/php/connect_db.php");
 
-/*
-** This file is used to load all events linked to the currently logged in user (user ID).  It is called from my_events.php ("My Events")
-*/
-
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'dxlink_local_db');
-define('DB_USER', 'root');
-define('DB_PASSWORD', 'root');
-define('DB_ENCODING', 'utf8');
 
 function createDatabaseConnection()
 {
@@ -29,7 +20,7 @@ function createDatabaseConnection()
 }
 
 
-class userEvents{
+class Programs{
 
     /**
      * @var object Database connection
@@ -42,25 +33,15 @@ class userEvents{
     public $user = 0;
 
     /**
-     * @var user ID
-     */
-    public $admin_logged = false;   
-
-    /**
      * @var all table rows that need to be displayed
      */
-    public $events;
-
-    /**
-     * @var containing the number of all the events per user
-     */
- 	public $events_empty = false;
+    public $programs;
 
 
     /**
      * @var one compact object containing the events
      */
-	public $event_thread;
+	public $program_thread;
     
 
     /**
@@ -79,8 +60,6 @@ class userEvents{
         // start the session, always needed!
         $this->doStartSession();
         $this->db_connection = createDatabaseConnection(); // get database connection credentials
-        $this->getUserId();
-        $this->getRowCount();
     }
 
     /**
@@ -92,82 +71,31 @@ class userEvents{
         session_start();
     }
 
-    /**
-     * Simply returns the current status of the user's login
-     * @return bool User's login status
-     */
-    public function getUserId()
-    {
-        if (isset($_COOKIE['remember_repzone']) && !empty($_COOKIE['remember_repzone'])) { $this->user = $_COOKIE['remember_repzone']; $this->user_is_logged_in = true; }
-        elseif (isset($_SESSION['rep_zone_user']) && !empty($_SESSION['rep_zone_user'])) { $this->user = $_SESSION['rep_zone_user']; $this->user_is_logged_in = true; }
-    }
-
-    //Get number of total rows
-	public function getRowCount() {
-
-        $page = end((explode('/', rtrim($_SERVER[REQUEST_URI], '/'))));
-        $page = substr($page, 0, 14);
-
-        if (strcmp($page, "all_events.php") === 0) {
-            $sql = "SELECT COUNT(*) AS count FROM events";
-            $query = $this->db_connection->prepare($sql);
-        }
-
-        else{
-            $sql = "SELECT COUNT(*) AS count FROM events WHERE rep_id = :user";
-            $query = $this->db_connection->prepare($sql);
-            $query->bindParam(':user', $this->user);
-        }
-		
-        $query->execute();
-
-        while($result_row = $query->fetch(PDO::FETCH_ASSOC) ){
-	        	$no_total_events = $result_row['count'];  
-	        	if($no_total_events == 0){
-	        		$this->events_empty = true;
-	        	} 
-	        	return true;
-        }
-
-        return false;
-
-	}
-
 	public function getRows() {
 
-		$this->Get_Events();
+		$this->Get_Programs();
 		$this->Print_Events();
 		$this->Close_DB_connection();
 
 	}
 
-	public function Get_Events(){
+	public function Get_Programs(){
 
-        $page = end((explode('/', rtrim($_SERVER[REQUEST_URI], '/'))));
-        $page = substr($page, 0, 14);
-
-        if (strcmp($page, "all_events.php") === 0) {
-            $sql = "SELECT event_id, DATE_FORMAT(event_date,'%W, %M %e, %Y') AS event_date, DATE_FORMAT(event_time,'%l:%i %p') AS event_time, location, attendees, status, rep_id FROM events ORDER BY DATE(event_date) ASC, event_time ASC";
-            $query = $this->db_connection->prepare($sql);
-        }
-
-        else{
-            $sql = "SELECT event_id, DATE_FORMAT(event_date,'%W, %M %e, %Y') AS event_date, DATE_FORMAT(event_time,'%l:%i %p') AS event_time, location, attendees, status FROM events WHERE rep_id = :user ORDER BY DATE(event_date) ASC, event_time ASC";
-            $query = $this->db_connection->prepare($sql);
-            $query->bindParam(':user', $this->user);
-        }
-
+        $sql = "SELECT program_id, program_title, program_subtitle, program_description, language, authors, url, DATE_FORMAT(launch_date,'%W, %M %e, %Y') AS launch_date, DATE_FORMAT(expiration_date,'%W, %M %e, %Y') AS expiration_date FROM programs WHERE `sponsor` = 'Merck' ORDER BY DATE(expiration_date) ASC";
+        $query = $this->db_connection->prepare($sql);
         $query->execute();
 
         while($result_row = $query->fetch(PDO::FETCH_ASSOC) ){
-    		$event_id = $result_row['event_id'];
-    		$event_date = $result_row['event_date'];
-        	$event_time = $result_row['event_time'];  
-			$location = $result_row['location'];  
-			$attendees = $result_row['attendees'];
-            $status = $result_row['status'];
-            (!empty($result_row['rep_id'])) ? $rep_id = $result_row['rep_id'] : $rep_id = null;
-			$this->Generate_Events($event_id, $event_date, $event_time, $location, $attendees, $status, $rep_id);
+    		$program_id = $result_row['program_id'];
+    		$title = $result_row['program_title'];
+        	$subtitle = $result_row['program_subtitle'];  
+			$description = $result_row['program_description'];  
+			$language = $result_row['language'];
+            $url = $result_row['url'];
+            (!empty($result_row['authors'])) ? $authors = $result_row['authors'] : $authors = 'N/A';
+            (!empty($result_row['launch_date'])) ? $launch_date = $result_row['launch_date'] : $launch_date = 'N/A';
+            (!empty($result_row['expiration_date'])) ? $expiration_date = $result_row['expiration_date'] : $expiration_date = 'N/A';
+			$this->Generate_rows($program_id, $title, $subtitle, $description, $language, $url, $authors, $launch_date, $expiration_date);
         }
 
 		return true;
@@ -175,148 +103,68 @@ class userEvents{
 	}
 
  	public function setTableContent(){
-        $this->checkAdminlogin();
  		$this->getRows();
-        
-        if($this->admin_logged){    
-    		$content = "<div id='content'>
-                              <table class='table table-striped table-hover' id='sortable'>
-                                <thead>
-                                  <tr>
-                                    <th class='col-sm-1'>Event #ID</th>
-                                    <th class='col-sm-1'>Rep #ID</th>
-                                    <th class='col-sm-3'>Date and time of session</th>
-                                    <th class='col-sm-3 col-md-4'>Location</th>
-                                    <th class='col-sm-1'>Number of attendees</th>
-                                    <th class='col-sm-2 col-md-1'>Event status</th>
-                                    <th class='col-sm-1'></th>
-                                  </tr>
-                                </thead>
-                                <tbody id='events'>
-                                     {$this->event_thread}
-                                </tbody>
-                              </table> 
-                            </div>  ";
-        }
-
-        else{
-            $content = "<div id='content'>
-                              <table class='table table-striped table-hover' id='sortable'>
-                                <thead>
-                                  <tr>
-                                    <th class='col-sm-3'>Date and time of session</th>
-                                    <th class='col-sm-5 col-md-6'>Location</th>
-                                    <th class='col-sm-1'>Number of attendees</th>
-                                    <th class='col-sm-2 col-md-1'>Event status</th>
-                                    <th class='col-sm-1'></th>
-                                  </tr>
-                                </thead>
-                                <tbody id='events'>
-                                     {$this->event_thread}
-                                </tbody>
-                              </table> 
-                            </div>  ";            
-        }
+ 
+		$content = "<div id='content'>
+                          <table class='table table-striped table-hover' id='sortable'>
+                            <thead>
+                              <tr>
+                                <th class='col-sm-1'>program #ID</th>
+                                <th class='col-sm-1'>program title</th>
+                                <th class='col-sm-2'>program subtitle</th>
+                                <th class='col-sm-2'>program description</th>
+                                <th class='col-sm-1'>language</th>
+                                <th class='col-sm-1'>authors</th>
+                                <th class='col-sm-1'>url</th>
+                                <th class='col-sm-1'>launch date</th>
+                                <th class='col-sm-1'>expiration date</th>
+                                <th class='col-sm-1' style='padding-left: 25px;'>image</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                 {$this->program_thread}
+                            </tbody>
+                          </table> 
+                        </div>  ";
 
         echo $content;
  	}
 
-	public function Generate_Events($event_id, $event_date, $event_time, $location, $attendees, $status, $rep_id){
+	public function Generate_rows($program_id, $title, $subtitle, $description, $language, $url, $authors, $launch_date, $expiration_date){
 
-        if(!empty($status)){
-          $button_style = $this->Generate_Status($status);  
-          $status_button = "<td><button type='button' class='btn $button_style disabled'>$status</button> </td>";
-        }
-        else{ $status_button = "<td>&nbsp;</td>"; }
-
-        if($this->admin_logged){
-            $this->events .= "<tr >\n
-                                <td>$event_id</td>\n
-                                <td>$rep_id</td>\n
-                                <td>$event_date at $event_time</td>\n
-                                <td>$location</td>\n
-                                <td>$attendees</td>\n
-                                $status_button\n
-                                <td><a href='myevent.php' class='btn btn-default' id='$event_id'>View</a></td>\n
-                            </tr>\n
-                                 ";        
-        }
-
-        else{
-            $this->events .= "<tr >\n
-                    <td>$event_date at $event_time</td>\n
-                    <td>$location</td>\n
-                    <td>$attendees</td>\n
-                    $status_button\n
-                    <td><a href='myevent.php' class='btn btn-default' id='$event_id'>View</a></td>\n
+            $this->programs .= "<tr >\n
+                    <td>$program_id</td>\n
+                    <td>$title</td>\n
+                    <td>$subtitle</td>\n
+                    <td>$description</td>\n
+                    <td>$language</td>\n
+                    <td>$url</td>\n
+                    <td>$authors</td>\n
+                    <td>$launch_date</td>\n
+                    <td>$expiration_date</td>\n
+                    <td><a href='#' class='btn btn-default' id='$program_id'>download</a></td>\n
                 </tr>\n
                      ";
-        }
 
 	}
 
-    public function Generate_Status($status){
-
-        $status_str = '';
-
-        switch ($status) {
-            case 'pending':
-                $status_str = 'btn-warning';
-                break;
-            case 'approved':
-                $status_str = 'btn-success';
-                break;
-            case 'cancelled':
-                $status_str = 'btn-danger';
-                break;
-            case 'closed':
-                $status_str = 'btn-primary';
-                break;
-        }
-
-        return $status_str;
-    }
-
-	public function printAlert(){
-        $page = end((explode('/', rtrim($_SERVER[REQUEST_URI], '/'))));
-        $page = substr($page, 0, 14);
-
-        if (strcmp($page, "all_events.php") === 0) {
-            $alert = "<div class='alert alert-warning fade in' role='alert' ><h4>There are currently no events in the database</h4></div>";
-        }
-
-        else{
-            $alert = "<div class='alert alert-warning fade in' role='alert' ><h4>You don't have any events</h4></div>";
-        }
-
-		echo $alert;	
-	}
-
-	public function Clear_Events(){
-		$this->events = '';
+	public function Clear_program_row(){
+		$this->programs = '';
 	}
 
 	public function Print_Events(){
-		if(empty($this->events)) { return false; }
-		$this->event_thread = $this->events;
+		if(empty($this->programs)) { return false; }
+		$this->program_thread = $this->programs;
 
-		$this->Clear_Events(); //Clear all concatenated rows
+		$this->Clear_program_row(); //Clear all concatenated rows
 	}
 
 	private function Close_DB_connection(){
     	$this->db_connection = null;
 	}
 
-    public function checkAdminlogin()
-    {   
-        if (isset($_SESSION["repzone_admin"]) && $_SESSION["repzone_admin"]) {
-            $this->admin_logged = true;
-        }
-    }
-
 } //ends class
 
-$my_events = new userEvents();
-
+$programs = new Programs();
 
 ?>
