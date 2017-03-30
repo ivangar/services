@@ -1,16 +1,15 @@
 
 $(document).ready(function () {
 
-      //Create Excel Forum Report file and export asynchronously
+     /*
       $('body').on('click', 'a.btn-default', function(event) {
           event.preventDefault();
           image = $(this).attr("id");
-
+          console.log(image);
           $.fileDownload('http://www.dxlink.ca/services/programs/get_programs/image/' + image + '.jpg');
-          //$.fileDownload('http://www.dxlink.ca/services/programs/get_programs/image/demo.xlsx');
 
           //console.log(image);
-          /*$.ajax({
+            $.ajax({
               url: "lib/accounts.php?action=exportUsers",
               cache: false,
               type: "POST",
@@ -21,9 +20,9 @@ $(document).ready(function () {
                  $.fileDownload('https://dxlink.ca/admin/Reports/dxLink_Users.xlsx');
                }
           });
-        */
+        
 
       });
-
+*/
 
   });//end document.ready

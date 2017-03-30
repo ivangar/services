@@ -81,7 +81,7 @@ class Programs{
 
 	public function Get_Programs(){
 
-        $sql = "SELECT program_id, program_title, program_subtitle, program_description, language, authors, url, DATE_FORMAT(launch_date,'%W, %M %e, %Y') AS launch_date, DATE_FORMAT(expiration_date,'%W, %M %e, %Y') AS expiration_date FROM programs WHERE `sponsor` = 'Merck' ORDER BY DATE(expiration_date) ASC";
+        $sql = "SELECT program_id, program_title, program_subtitle, program_description, language, authors, url, launch_date, expiration_date FROM programs WHERE `sponsor` = 'Merck' AND DATEDIFF(NOW(), expiration_date) <= 0 ORDER BY DATE(expiration_date) ASC";
         $query = $this->db_connection->prepare($sql);
         $query->execute();
 
@@ -114,8 +114,8 @@ class Programs{
                                 <th class='col-sm-2'>program subtitle</th>
                                 <th class='col-sm-2'>program description</th>
                                 <th class='col-sm-1'>language</th>
-                                <th class='col-sm-1'>authors</th>
                                 <th class='col-sm-1'>url</th>
+                                <th class='col-sm-1'>authors</th>
                                 <th class='col-sm-1'>launch date</th>
                                 <th class='col-sm-1'>expiration date</th>
                                 <th class='col-sm-1' style='padding-left: 25px;'>image</th>
@@ -142,7 +142,7 @@ class Programs{
                     <td>$authors</td>\n
                     <td>$launch_date</td>\n
                     <td>$expiration_date</td>\n
-                    <td><a href='#' class='btn btn-default' id='$program_id'>download</a></td>\n
+                    <td><a href='image/$program_id.jpg' class='btn btn-default' download id='$program_id'>download</a></td>\n
                 </tr>\n
                      ";
 
