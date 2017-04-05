@@ -16,6 +16,13 @@ table.table-bordered th, table.table-bordered td {
    text-align: center;   
 }
 
+
+table.table-striped td.url {
+   width:400px;
+   max-width:400px;
+   word-wrap:break-word;
+}
+
 a.normal{
 	color: black;
 }
