@@ -6,6 +6,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 require_once("lib/get_programs.php");
 /*  Adding cache statements in the header to disable page to cache information */
+//unset($_SESSION['access']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,10 +23,23 @@ require_once("lib/get_programs.php");
 
     <!-- Custom CSS -->
     <link href="css/sb-admin-2.css?<?php echo time(); ?>" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <link href="css/main.css?<?php echo time(); ?>" rel="stylesheet">
-
 </head>
 <body>
+<div id="password-dialog-form" title="Password access" style="display:none;">
+    <p class="validateTips"></p>
+    <p>Please enter the password to access this page</p>
+    <form id="pwd-access">
+        <input type='hidden' name='login_submitted' id='login_submitted' value='1' />
+        <fieldset>
+          <label for="pwd">Password:</label>
+          <input type="password" name="pwd" id="pwd" class="text ui-widget-content ui-corner-all">
+          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+    </form>
+</div>
+<?php if(isset($_SESSION['access']) && $_SESSION['access']){?>
     <div id="wrapper">
 
         <!-- Page Content -->
@@ -50,16 +64,21 @@ require_once("lib/get_programs.php");
 
     </div>
     <!-- /#wrapper -->
-
+<?php }?>
     <!-- jQuery -->
-
-
 
     <script src="js/jquery.min.js"></script>
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
-    <!--<script src="js/jquery.fileDownload.js"></script>
-    <script src="js/image.js"></script>-->
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <!--<script src="js/jquery.fileDownload.js"></script>-->
+    <script src="js/programs.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        var access = <?php if(isset($_SESSION['access'])) {echo "true"; } else echo "false"; ?>;
+        if(!access){ $( "#password-dialog-form" ).dialog( "open" );}
+    });
+    </script>
 </body>
 
 </html>
