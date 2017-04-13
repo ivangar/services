@@ -72,7 +72,8 @@ require_once("lib/get_programs.php");
     <script src="js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <!--<script src="js/jquery.fileDownload.js"></script>-->
-    <script src="js/programs.js"></script>
+    <script src="js/jquery.tablesorter.min.js"></script>
+    <script src="js/programs.js?<?php echo time(); ?>"></script>
     <script type="text/javascript">
     $(document).ready(function(){
         var access = <?php if(isset($_SESSION['access'])) {echo "true"; } else echo "false"; ?>;

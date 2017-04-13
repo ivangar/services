@@ -44,3 +44,10 @@ input.text {
 .bottom-buffer { margin-bottom:20px; }
 .top-shift { margin-top:-15px; }
 .bottom-shift { margin-bottom:-15px; }
+
+.btn-success:focus{
+    background-color: #5cb85c;
+    color: #FFFFFF;
+    border-color: #4cae4c;
+    outline: none;
+}

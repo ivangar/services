@@ -81,7 +81,7 @@ class Programs{
 
 	public function Get_Programs(){
 
-        $sql = "SELECT program_id, therapeutic_areas.area_name, program_title, program_subtitle, program_description, language, authors, url, launch_date, expiration_date FROM programs, therapeutic_areas WHERE `sponsor` = 'Merck' AND programs.area_id = therapeutic_areas.area_id AND DATEDIFF(NOW(), expiration_date) <= 0 ORDER BY DATE(expiration_date) ASC";
+        $sql = "SELECT program_id, therapeutic_areas.area_name, program_title, program_subtitle, program_description, language, authors, url, launch_date, expiration_date FROM programs, therapeutic_areas WHERE `sponsor` = 'Merck' AND programs.area_id = therapeutic_areas.area_id AND DATEDIFF(NOW(), expiration_date) <= 0 ORDER BY language, therapeutic_areas.area_name";
         $query = $this->db_connection->prepare($sql);
         $query->execute();
 
@@ -127,12 +127,33 @@ class Programs{
                             </thead>
                             <tbody>
                                  {$this->program_thread}
+                                 {$this->setExportRow()}
                             </tbody>
                           </table> 
-                        </div>  ";
+                        </div> 
+                         ";
 
         echo $content;
  	}
+
+  public function setExportRow(){
+
+      $export_row = "<tr style='background-color: #FFFFFF;padding-top:20px;'>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td></td>\n
+                        <td style='padding-top:30px;'> <button type='button' class='btn btn-success btn-lg' id='reload'>Export images</button> </td>\n
+                     </tr>\n";
+
+     return $export_row;
+
+  }
 
 	public function Generate_rows($program_id, $therapeutic_area, $title, $subtitle, $description, $language, $url, $authors, $launch_date, $expiration_date){
 

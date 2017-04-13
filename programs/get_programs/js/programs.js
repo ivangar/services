@@ -10,6 +10,10 @@ $(document).ready(function () {
         .addClass( "ui-state-error" );
     }
 
+    $(function(){
+      $("#sortable").tablesorter();
+    });
+
     function processPwd() {
 
         var form = document.getElementById("pwd-access");
@@ -70,6 +74,27 @@ $(document).ready(function () {
         event.preventDefault();
         return false;
       }
+    });
+
+    $('button.btn-success').click(function(){
+ 
+        $.ajax({
+            url: "lib/upload.php",
+            cache: false,
+            type: "POST",
+            dataType: "html"
+        }) 
+        .done(function( data ) {
+              console.log('data  before if ' + data);
+              if(data === 'access'){
+                 window.location.href = 'image/images.zip';
+              }
+
+              else{
+                  console.log('data from else ' + data);
+              }
+        });
+ 
     });
 
 
