@@ -75,9 +75,14 @@ require_once("lib/get_programs.php");
     <script src="js/jquery.tablesorter.min.js"></script>
     <script src="js/programs.js?<?php echo time(); ?>"></script>
     <script type="text/javascript">
+    // function changeColor(){
+    //     document.getElementsByClassName("launch_date").style.color="red";
+    //     console.log("in change color");
+    // }
     $(document).ready(function(){
         var access = <?php if(isset($_SESSION['access'])) {echo "true"; } else echo "false"; ?>;
         if(!access){ $( "#password-dialog-form" ).dialog( "open" );}
+        // changeColor();
     });
     </script>
 </body>

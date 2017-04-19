@@ -81,7 +81,7 @@ class Programs{
 
 	public function Get_Programs(){
 
-        $sql = "SELECT program_id, therapeutic_areas.area_name, program_title, program_subtitle, program_description, language, authors, url, launch_date, expiration_date FROM programs, therapeutic_areas WHERE `sponsor` = 'Merck' AND programs.area_id = therapeutic_areas.area_id AND DATEDIFF(NOW(), expiration_date) <= 0 ORDER BY language, therapeutic_areas.area_name";
+        $sql = "SELECT program_id, therapeutic_areas.area_name, program_title, program_subtitle, program_description, language, authors, url, launch_date, expiration_date FROM programs, therapeutic_areas WHERE `sponsor` = 'Merck' AND programs.area_id = therapeutic_areas.area_id AND DATEDIFF(NOW(), expiration_date) <= 0 ORDER BY launch_date DESC";
         $query = $this->db_connection->prepare($sql);
         $query->execute();
 
@@ -157,6 +157,14 @@ class Programs{
 
 	public function Generate_rows($program_id, $therapeutic_area, $title, $subtitle, $description, $language, $url, $authors, $launch_date, $expiration_date){
 
+            //checks if program was launched in last 30 days, and if yes, adds NEW and puts it in red
+            if((time() - strtotime($launch_date)) < (30 * 3600 * 24)){
+              $new_launch_date = "<span style='color:red'>NEW!<br> {$launch_date}</span>";
+            }
+            else{
+              $new_launch_date = $launch_date;
+            }
+
             $this->programs .= "<tr >\n
                     <td>$therapeutic_area</td>\n
                     <td>$title</td>\n
@@ -165,11 +173,12 @@ class Programs{
                     <td>$language</td>\n
                     <td class='url'>$url</td>\n
                     <td>$authors</td>\n
-                    <td>$launch_date</td>\n
+                    <td>$new_launch_date</td>\n
                     <td>$expiration_date</td>\n
                     <td><a href='image/$program_id.jpg' class='btn btn-default' download id='$program_id'>download</a></td>\n
                 </tr>\n
                      ";
+            
 
 	}
 
